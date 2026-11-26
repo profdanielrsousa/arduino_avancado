@@ -1,0 +1,61 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\ctikzset{
+    resistors/scale=0.8
+}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: ESP32 DEVKITC V4 (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (-5.2, -2.2) rectangle (0, 2.2);
+    \node[align=center, font=\sffamily\bfseries] at (-3.0, 0.3) {U1\\ESP32};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (-3.0, -0.6) {(DevKitC V4)};
+
+    % Alimentacao de U1 (+3,3V e GND)
+    \draw (-2.6, 2.2) -- (-2.6, 3.0) node[vcc]{+3,3V};
+    \node[below, font=\ttfamily\footnotesize] at (-2.6, 2.2) {3V3};
+
+    \draw (-2.6, -2.2) -- (-2.6, -3.0) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (-2.6, -2.2) {GND};
+
+    % Pino de dados de U1
+    \node[left, font=\ttfamily\scriptsize] at (0, 0) {GPIO13};
+
+    % =========================================================================
+    % 2. BARRAMENTO DE DADOS E RESISTOR DE PULL-UP (R1 = 10 kOhm)
+    % =========================================================================
+    \draw[<->, >=stealth, thick] (0, 0) -- (4.4, 0);
+    \node[below, font=\ttfamily\scriptsize] at (1.0, 0) {DATA};
+
+    % Pull-up R1 (10 kOhm) para +3,3V
+    \draw (2.2, 0) node[circ]{} -- (2.2, 0.5)
+        to[R, l^=R1, a_=10<\kilo\ohm>] (2.2, 2.6)
+        -- (2.2, 3.0) node[vcc]{+3,3V};
+
+    % =========================================================================
+    % 3. BLOCO DIREITO: SENSOR DHT22 (U2)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (4.4, -2.2) rectangle (9.2, 2.2);
+    \node[align=center, font=\sffamily\bfseries] at (7.0, 0.3) {U2\\DHT22};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (7.0, -0.6) {(Temp. / Umid.)};
+
+    % Alimentacao de U2 (+3,3V e GND)
+    \draw (6.8, 2.2) -- (6.8, 3.0) node[vcc]{+3,3V};
+    \node[below, font=\ttfamily\scriptsize] at (6.8, 2.2) {VCC};
+
+    \draw (6.8, -2.2) -- (6.8, -3.0) node[ground]{};
+    \node[above, font=\ttfamily\scriptsize] at (6.8, -2.2) {GND};
+
+    % Pino de dados de U2
+    \node[right, font=\ttfamily\scriptsize] at (4.4, 0) {SDA};
+
+\end{circuitikz}
+\end{document}

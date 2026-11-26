@@ -1,0 +1,58 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\ctikzset{
+    resistors/scale=0.8,
+    diodes/scale=0.8
+}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: ARDUINO UNO R3 (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (0, -7.0) rectangle (4.0, 7.0);
+    \node[align=center, font=\sffamily\bfseries] at (2.0, 0.4) {U1\\Arduino\\Uno R3};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (2.0, -0.6) {(ATmega328P)};
+
+    % Alimentacao do Arduino
+    \draw (0, 5.8) -- (-0.8, 5.8) node[vcc]{+5V};
+    \node[right, font=\ttfamily\footnotesize] at (0, 5.8) {5V};
+
+    \draw (0, -5.8) -- (-0.8, -5.8) node[ground]{};
+    \node[right, font=\ttfamily\footnotesize] at (0, -5.8) {GND};
+
+    % =========================================================================
+    % 2. BLOCO DIREITO: 8 LEDs (LED0 a LED7) + LED_BUILTIN + RESISTORES DE 220 OHMS
+    % =========================================================================
+    \foreach \y/\pin/\dname/\rname in {
+        6.0/D2/LED0/R0,
+        4.5/D3/LED1/R1,
+        3.0/D4/LED2/R2,
+        1.5/D5/LED3/R3,
+        0.0/D6/LED4/R4,
+        -1.5/D7/LED5/R5,
+        -3.0/D8/LED6/R6,
+        -4.5/D9/LED7/R7,
+        -6.0/D13/{LED\_BUILTIN}/R8%
+    }{
+        \node[left, font=\ttfamily\footnotesize] at (4.0, \y) {\pin};
+        \draw (4.0, \y) -- (4.8, \y)
+            to[leDo, l^={\dname}] (7.2, \y)
+            to[R, l^=\rname, a_=220<\ohm>] (9.8, \y)
+            -- (10.6, \y);
+    }
+
+    % Barramento comum de GND (sem ponto no canto superior de 90 graus)
+    \draw (10.6, 6.0) -- (10.6, -7.0) node[ground]{};
+    \foreach \y in {4.5, 3.0, 1.5, 0.0, -1.5, -3.0, -4.5, -6.0}{
+        \node[circ] at (10.6, \y) {};
+    }
+
+\end{circuitikz}
+\end{document}

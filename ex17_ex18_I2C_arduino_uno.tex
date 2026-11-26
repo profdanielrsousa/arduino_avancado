@@ -1,0 +1,75 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\ctikzset{
+    resistors/scale=0.8
+}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: ARDUINO UNO R3 - MESTRE (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (-6.0, -3.0) rectangle (-1.2, 3.0);
+    \node[align=center, font=\sffamily\bfseries] at (-4.2, 0.4) {U1\\Arduino\\Uno R3};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (-4.2, -0.7) {(Mestre)};
+
+    % Alimentacao de U1
+    \draw (-3.6, 3.0) -- (-3.6, 3.8) node[vcc]{+5V};
+    \node[below, font=\ttfamily\footnotesize] at (-3.6, 3.0) {5V};
+
+    \draw (-3.6, -3.0) -- (-3.6, -3.8) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (-3.6, -3.0) {GND};
+
+    % Pinos I2C de U1
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, 0.8) {A4 (SDA)};
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, -0.8) {A5 (SCL)};
+
+    % =========================================================================
+    % 2. BARRAMENTO I2C (SDA, SCL) E RESISTORES DE PULL-UP (R1, R2 = 10k)
+    % =========================================================================
+    % Linhas SDA (bidirecional) e SCL (unidirecional)
+    \draw[<->, >=stealth, thick] (-1.2, 0.8) -- (4.6, 0.8);
+    \node[above, font=\ttfamily\scriptsize] at (-0.3, 0.8) {SDA};
+
+    \draw[->, >=stealth, thick] (-1.2, -0.8) -- (4.6, -0.8);
+    \node[below, font=\ttfamily\scriptsize] at (-0.3, -0.8) {SCL};
+
+    % Barramento +5V dos resistores de pull-up (ponto apenas na juncao em T)
+    \draw (0.6, 3.6) -- (2.8, 3.6);
+    \node[vcc] at (1.7, 3.6) {+5V};
+    \node[circ] at (1.7, 3.6) {};
+
+    % Pull-up R1 (10 kOhm) na linha SDA
+    \draw (0.6, 0.8) node[circ]{} -- (0.6, 1.4)
+        to[R, l^=R1, a_=10<\kilo\ohm>] (0.6, 3.6);
+
+    % Pull-up R2 (10 kOhm) na linha SCL
+    \draw (2.8, -0.8) node[circ]{} -- (2.8, 1.4)
+        to[R, l^=R2, a_=10<\kilo\ohm>] (2.8, 3.6);
+
+    % =========================================================================
+    % 3. BLOCO DIREITO: ARDUINO UNO R3 - ESCRAVO (U2)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (4.6, -3.0) rectangle (9.4, 3.0);
+    \node[align=center, font=\sffamily\bfseries] at (7.6, 0.4) {U2\\Arduino\\Uno R3};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (7.6, -0.7) {(Escravo)};
+
+    % Alimentacao de U2
+    \draw (7.0, 3.0) -- (7.0, 3.8) node[vcc]{+5V};
+    \node[below, font=\ttfamily\footnotesize] at (7.0, 3.0) {5V};
+
+    \draw (7.0, -3.0) -- (7.0, -3.8) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (7.0, -3.0) {GND};
+
+    % Pinos I2C de U2
+    \node[right, font=\ttfamily\scriptsize] at (4.6, 0.8) {A4 (SDA)};
+    \node[right, font=\ttfamily\scriptsize] at (4.6, -0.8) {A5 (SCL)};
+
+\end{circuitikz}
+\end{document}

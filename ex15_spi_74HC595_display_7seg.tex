@@ -1,0 +1,178 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\ctikzset{
+    resistors/scale=0.75
+}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. ARDUINO UNO R3 (ARD1) - SPI POR HARDWARE (D11, D13, D10)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (-9.2, -2.4) rectangle (-4.4, 4.0);
+    \node[align=center, font=\sffamily\bfseries] at (-7.4, 1.1) {ARD1\\Arduino\\Uno R3};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (-7.4, 0.0) {(ATmega328P)};
+
+    % Alimentacao do Arduino
+    \draw (-6.8, 4.0) -- (-6.8, 4.8) node[vcc]{+5V};
+    \node[below, font=\ttfamily\footnotesize] at (-6.8, 4.0) {5V};
+
+    \draw (-6.8, -2.4) -- (-6.8, -3.2) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (-6.8, -2.4) {GND};
+
+    % Pinos SPI do Arduino conectados diretamente a U1
+    \node[left, font=\ttfamily\scriptsize] at (-4.4, 2.4) {D11 (MOSI)};
+    \draw (-4.4, 2.4) -- (0, 2.4) node[midway, above, font=\ttfamily\scriptsize] {SDI};
+
+    \node[left, font=\ttfamily\scriptsize] at (-4.4, 0.8) {D13 (SCK)};
+    \draw (-4.4, 0.8) -- (0, 0.8) node[midway, above, font=\ttfamily\scriptsize] {SCLK};
+
+    \node[left, font=\ttfamily\scriptsize] at (-4.4, -0.8) {D10 (SS)};
+    \draw (-4.4, -0.8) -- (0, -0.8) node[midway, above, font=\ttfamily\scriptsize] {LOAD};
+
+    % =========================================================================
+    % 2. ESTAGIO SUPERIOR: U1 (74HC595 - DEZENAS) -> DISP1 (5011BS)
+    % =========================================================================
+    % Bloco U1
+    \draw[thick, fill=gray!5] (0, -5.2) rectangle (4.6, 5.2);
+    \node[align=center, font=\sffamily\bfseries] at (2.3, 0.4) {U1\\74HC595};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (2.3, -0.5) {(Dezenas)};
+
+    % Alimentacao e controle fixo de U1
+    \draw (1.4, 5.2) -- (1.4, 6.0) node[vcc]{+5V};
+    \node[below, font=\ttfamily\scriptsize] at (1.4, 5.2) {VCC (16)};
+
+    \draw (3.2, 5.2) -- (3.2, 6.0) node[vcc]{+5V};
+    \node[below, font=\ttfamily\scriptsize] at (3.2, 5.2) {$\overline{\text{MR}}$ (10)};
+
+    \draw (1.4, -5.2) -- (1.4, -6.0) node[ground]{};
+    \node[above, font=\ttfamily\scriptsize] at (1.4, -5.2) {GND (8)};
+
+    \draw (3.2, -5.2) -- (3.2, -6.0) node[ground]{};
+    \node[above, font=\ttfamily\scriptsize] at (3.2, -5.2) {$\overline{\text{OE}}$ (13)};
+
+    % Entradas de controle de U1 (Esquerda)
+    \node[right, font=\ttfamily\scriptsize] at (0, 2.4) {DS (14)};
+    \node[right, font=\ttfamily\scriptsize] at (0, 0.8) {SH\_CP (11)};
+    \node[right, font=\ttfamily\scriptsize] at (0, -0.8) {ST\_CP (12)};
+
+    % Saida de cascateamento Q7' de U1
+    \draw (0, -2.8) -- (-1.0, -2.8) node[left, font=\ttfamily\scriptsize] {Q7'\_U1};
+    \node[right, font=\ttfamily\scriptsize] at (0, -2.8) {Q7' (9)};
+
+    % Bloco DISP1 (5011BS - Anodo Comum)
+    \draw[thick, fill=gray!5] (8.6, -5.2) rectangle (12.8, 5.2);
+    \node[align=center, font=\sffamily\bfseries] at (10.9, 0.4) {DISP1\\5011BS};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (10.9, -0.5) {(Ânodo Comum)};
+
+    % Anodos comuns de DISP1 (Pinos 3 e 8 -> +5V)
+    \draw (10.7, 5.2) -- (10.7, 6.0) node[vcc]{+5V};
+    \node[below, font=\ttfamily\scriptsize] at (10.7, 5.2) {COM (3, 8)};
+
+    % 8 Resistores de 220 Ohms (U1 -> DISP1)
+    \foreach \y/\qpin/\rname/\seg in {
+        4.2/Q0 (15)/R1/A (7),
+        3.0/Q1 (1)/R2/B (6),
+        1.8/Q2 (2)/R3/C (4),
+        0.6/Q3 (3)/R4/D (2),
+        -0.6/Q4 (4)/R5/E (1),
+        -1.8/Q5 (5)/R6/F (9),
+        -3.0/Q6 (6)/R7/G (10),
+        -4.2/Q7 (7)/R8/DP (5)%
+    }{
+        \node[left, font=\ttfamily\scriptsize] at (4.6, \y) {\qpin};
+        \draw (4.6, \y) to[R, l^=\rname, a_=220<\ohm>] (8.6, \y);
+        \node[right, font=\ttfamily\scriptsize] at (8.6, \y) {\seg};
+    }
+
+    % =========================================================================
+    % 3. ESTAGIO INFERIOR: U2 (74HC595 - UNIDADES) -> DISP2 (5011BS)
+    % =========================================================================
+    \begin{scope}[yshift=-15.6cm]
+        % Bloco U2
+        \draw[thick, fill=gray!5] (0, -5.2) rectangle (4.6, 5.2);
+        \node[align=center, font=\sffamily\bfseries] at (2.3, 0.4) {U2\\74HC595};
+        \node[font=\sffamily\scriptsize, text=gray!70!black] at (2.3, -0.5) {(Unidades)};
+
+        % Alimentacao e controle fixo de U2
+        \draw (1.4, 5.2) -- (1.4, 6.0) node[vcc]{+5V};
+        \node[below, font=\ttfamily\scriptsize] at (1.4, 5.2) {VCC (16)};
+
+        \draw (3.2, 5.2) -- (3.2, 6.0) node[vcc]{+5V};
+        \node[below, font=\ttfamily\scriptsize] at (3.2, 5.2) {$\overline{\text{MR}}$ (10)};
+
+        \draw (1.4, -5.2) -- (1.4, -6.0) node[ground]{};
+        \node[above, font=\ttfamily\scriptsize] at (1.4, -5.2) {GND (8)};
+
+        \draw (3.2, -5.2) -- (3.2, -6.0) node[ground]{};
+        \node[above, font=\ttfamily\scriptsize] at (3.2, -5.2) {$\overline{\text{OE}}$ (13)};
+
+        % Entradas de controle de U2 (Esquerda)
+        \draw (0, 2.4) -- (-1.0, 2.4) node[left, font=\ttfamily\scriptsize] {Q7'\_U1};
+        \node[right, font=\ttfamily\scriptsize] at (0, 2.4) {DS (14)};
+
+        \draw (0, 0.8) -- (-1.0, 0.8) node[left, font=\ttfamily\scriptsize] {SCLK};
+        \node[right, font=\ttfamily\scriptsize] at (0, 0.8) {SH\_CP (11)};
+
+        \draw (0, -0.8) -- (-1.0, -0.8) node[left, font=\ttfamily\scriptsize] {LOAD};
+        \node[right, font=\ttfamily\scriptsize] at (0, -0.8) {ST\_CP (12)};
+
+        % Saida de cascateamento Q7' de U2 -> SDO
+        \draw (0, -2.8) -- (-1.0, -2.8) node[left, font=\ttfamily\scriptsize] {SDO};
+        \node[right, font=\ttfamily\scriptsize] at (0, -2.8) {Q7' (9)};
+
+        % Bloco DISP2 (5011BS - Anodo Comum)
+        \draw[thick, fill=gray!5] (8.6, -5.2) rectangle (12.8, 5.2);
+        \node[align=center, font=\sffamily\bfseries] at (10.9, 0.4) {DISP2\\5011BS};
+        \node[font=\sffamily\scriptsize, text=gray!70!black] at (10.9, -0.5) {(Ânodo Comum)};
+
+        % Anodos comuns de DISP2 (Pinos 3 e 8 -> +5V)
+        \draw (10.7, 5.2) -- (10.7, 6.0) node[vcc]{+5V};
+        \node[below, font=\ttfamily\scriptsize] at (10.7, 5.2) {COM (3, 8)};
+
+        % 8 Resistores de 220 Ohms (U2 -> DISP2)
+        \foreach \y/\qpin/\rname/\seg in {
+            4.2/Q0 (15)/R9/A (7),
+            3.0/Q1 (1)/R10/B (6),
+            1.8/Q2 (2)/R11/C (4),
+            0.6/Q3 (3)/R12/D (2),
+            -0.6/Q4 (4)/R13/E (1),
+            -1.8/Q5 (5)/R14/F (9),
+            -3.0/Q6 (6)/R15/G (10),
+            -4.2/Q7 (7)/R16/DP (5)%
+        }{
+            \node[left, font=\ttfamily\scriptsize] at (4.6, \y) {\qpin};
+            \draw (4.6, \y) to[R, l^=\rname, a_=220<\ohm>] (8.6, \y);
+            \node[right, font=\ttfamily\scriptsize] at (8.6, \y) {\seg};
+        }
+
+        % =====================================================================
+        % 4. CONECTOR DE SAIDA (P2 - CASCATEAMENTO)
+        % =====================================================================
+        \draw[thick, fill=gray!5] (15.4, -2.2) rectangle (18.2, 2.2);
+        \node[align=center, font=\sffamily\bfseries] at (16.8, 1.7) {P2 (Saída)};
+
+        \draw (15.4, 1.0) -- (14.2, 1.0) node[vcc]{+5V};
+        \node[right, font=\ttfamily\scriptsize] at (15.4, 1.0) {1: VCC};
+
+        \draw (15.4, 0.2) -- (14.2, 0.2) node[ground]{};
+        \node[right, font=\ttfamily\scriptsize] at (15.4, 0.2) {2: GND};
+
+        \draw (15.4, -0.6) -- (14.2, -0.6) node[left, font=\ttfamily\scriptsize] {SDO};
+        \node[right, font=\ttfamily\scriptsize] at (15.4, -0.6) {3: SDO};
+
+        \draw (15.4, -1.2) -- (14.2, -1.2) node[left, font=\ttfamily\scriptsize] {SCLK};
+        \node[right, font=\ttfamily\scriptsize] at (15.4, -1.2) {4: SCLK};
+
+        \draw (15.4, -1.8) -- (14.2, -1.8) node[left, font=\ttfamily\scriptsize] {LOAD};
+        \node[right, font=\ttfamily\scriptsize] at (15.4, -1.8) {5: LOAD};
+    \end{scope}
+
+\end{circuitikz}
+\end{document}

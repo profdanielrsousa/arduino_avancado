@@ -1,0 +1,67 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: ARDUINO UNO R3 - MESTRE (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (-6.0, -3.4) rectangle (-1.2, 3.4);
+    \node[align=center, font=\sffamily\bfseries] at (-4.2, 0.4) {U1\\Arduino\\Uno R3};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (-4.2, -0.7) {(Mestre)};
+
+    % Alimentacao de U1
+    \draw (-3.6, 3.4) -- (-3.6, 4.2) node[vcc]{+5V};
+    \node[below, font=\ttfamily\footnotesize] at (-3.6, 3.4) {5V};
+
+    \draw (-3.6, -3.4) -- (-3.6, -4.2) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (-3.6, -3.4) {GND};
+
+    % Pinos SPI de U1
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, 1.8) {D13 (SCK)};
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, 0.6) {D12 (MISO)};
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, -0.6) {D11 (MOSI)};
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, -1.8) {D10 (SS)};
+
+    % =========================================================================
+    % 2. BARRAMENTO SPI (MESTRE <-> ESCRAVO)
+    % =========================================================================
+    \draw[->, >=stealth, thick] (-1.2, 1.8) -- (3.2, 1.8)
+        node[midway, above, font=\ttfamily\scriptsize] {SCK};
+
+    \draw[<-, >=stealth, thick] (-1.2, 0.6) -- (3.2, 0.6)
+        node[midway, above, font=\ttfamily\scriptsize] {MISO};
+
+    \draw[->, >=stealth, thick] (-1.2, -0.6) -- (3.2, -0.6)
+        node[midway, above, font=\ttfamily\scriptsize] {MOSI};
+
+    \draw[->, >=stealth, thick] (-1.2, -1.8) -- (3.2, -1.8)
+        node[midway, above, font=\ttfamily\scriptsize] {SS};
+
+    % =========================================================================
+    % 3. BLOCO DIREITO: ARDUINO UNO R3 - ESCRAVO (U2)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (3.2, -3.4) rectangle (8.0, 3.4);
+    \node[align=center, font=\sffamily\bfseries] at (6.2, 0.4) {U2\\Arduino\\Uno R3};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (6.2, -0.7) {(Escravo)};
+
+    % Alimentacao de U2
+    \draw (5.6, 3.4) -- (5.6, 4.2) node[vcc]{+5V};
+    \node[below, font=\ttfamily\footnotesize] at (5.6, 3.4) {5V};
+
+    \draw (5.6, -3.4) -- (5.6, -4.2) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (5.6, -3.4) {GND};
+
+    % Pinos SPI de U2
+    \node[right, font=\ttfamily\scriptsize] at (3.2, 1.8) {D13 (SCK)};
+    \node[right, font=\ttfamily\scriptsize] at (3.2, 0.6) {D12 (MISO)};
+    \node[right, font=\ttfamily\scriptsize] at (3.2, -0.6) {D11 (MOSI)};
+    \node[right, font=\ttfamily\scriptsize] at (3.2, -1.8) {D10 (SS)};
+
+\end{circuitikz}
+\end{document}

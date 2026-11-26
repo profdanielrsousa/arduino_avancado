@@ -1,0 +1,74 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: ARDUINO UNO R3 - MESTRE (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (-6.0, -3.4) rectangle (-1.2, 3.4);
+    \node[align=center, font=\sffamily\bfseries] at (-4.2, 0.4) {U1\\Arduino\\Uno R3};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (-4.2, -0.7) {(Mestre)};
+
+    % Alimentacao de U1
+    \draw (-3.6, 3.4) -- (-3.6, 4.2) node[vcc]{+5V};
+    \node[below, font=\ttfamily\footnotesize] at (-3.6, 3.4) {5V};
+
+    \draw (-3.6, -3.4) -- (-3.6, -4.2) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (-3.6, -3.4) {GND};
+
+    % Pinos SPI de U1
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, 1.8) {D13 (SCK)};
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, 0.6) {D12 (MISO)};
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, -0.6) {D11 (MOSI)};
+    \node[left, font=\ttfamily\scriptsize] at (-1.2, -1.8) {D10 (SS)};
+
+    % =========================================================================
+    % 2. BARRAMENTO SPI (MESTRE <-> ESCRAVO)
+    % =========================================================================
+    \draw[->, >=stealth, thick] (-1.2, 1.8) -- (3.2, 1.8)
+        node[midway, above, font=\ttfamily\scriptsize] {SCK};
+
+    \draw[<-, >=stealth, thick] (-1.2, 0.6) -- (3.2, 0.6)
+        node[midway, above, font=\ttfamily\scriptsize] {MISO};
+
+    \draw[->, >=stealth, thick] (-1.2, -0.6) -- (3.2, -0.6)
+        node[midway, above, font=\ttfamily\scriptsize] {MOSI};
+
+    \draw[->, >=stealth, thick] (-1.2, -1.8) -- (3.2, -1.8)
+        node[midway, above, font=\ttfamily\scriptsize] {SS};
+
+    % =========================================================================
+    % 3. BLOCO DIREITO: EEPROM 25LC1024 - ESCRAVO (U2)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (3.2, -3.4) rectangle (8.8, 3.4);
+    \node[align=center, font=\sffamily\bfseries] at (6.5, 0.4) {U2\\25LC1024};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (6.5, -0.5) {(EEPROM SPI)};
+
+    % Alimentacao e pinos de controle em +5V (VCC, WP, HOLD)
+    \draw (4.4, 3.4) -- (4.4, 4.2) node[vcc]{+5V};
+    \node[below, font=\ttfamily\scriptsize] at (4.4, 3.4) {VCC (8)};
+
+    \draw (6.0, 3.4) -- (6.0, 4.2) node[vcc]{+5V};
+    \node[below, font=\ttfamily\scriptsize] at (6.0, 3.4) {$\overline{\text{WP}}$ (3)};
+
+    \draw (7.6, 3.4) -- (7.6, 4.2) node[vcc]{+5V};
+    \node[below, font=\ttfamily\scriptsize] at (7.6, 3.4) {$\overline{\text{HOLD}}$ (7)};
+
+    % Aterramento de U2 (VSS)
+    \draw (6.0, -3.4) -- (6.0, -4.2) node[ground]{};
+    \node[above, font=\ttfamily\scriptsize] at (6.0, -3.4) {VSS (4)};
+
+    % Pinos SPI de U2
+    \node[right, font=\ttfamily\scriptsize] at (3.2, 1.8) {SCK (6)};
+    \node[right, font=\ttfamily\scriptsize] at (3.2, 0.6) {MISO (2)};
+    \node[right, font=\ttfamily\scriptsize] at (3.2, -0.6) {MOSI (5)};
+    \node[right, font=\ttfamily\scriptsize] at (3.2, -1.8) {SS (1)};
+
+\end{circuitikz}
+\end{document}

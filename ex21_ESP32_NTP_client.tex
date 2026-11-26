@@ -1,0 +1,67 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\ctikzset{
+    resistors/scale=0.8,
+    diodes/scale=0.8
+}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: ESP32 DEVKITC V4 (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (-5.2, -3.6) rectangle (0, 3.6);
+    \node[align=center, font=\sffamily\bfseries] at (-3.1, 0.4) {U1\\ESP32};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (-3.1, -0.5) {(DevKitC V4)};
+
+    % Alimentacao de U1
+    \draw (-2.6, 3.6) -- (-2.6, 4.4) node[vcc]{+5V};
+    \node[below, font=\ttfamily\footnotesize] at (-2.6, 3.6) {5V};
+
+    \draw (-2.6, -3.6) -- (-2.6, -4.4) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (-2.6, -3.6) {GND};
+
+    % Pinos utilizados em U1
+    \node[left, font=\ttfamily\scriptsize] at (0, 2.2) {GPIO21 (SDA)};
+    \node[left, font=\ttfamily\scriptsize] at (0, 0.8) {GPIO22 (SCL)};
+    \node[left, font=\ttfamily\scriptsize] at (0, -2.6) {GPIO15};
+
+    % =========================================================================
+    % 2. BLOCO DIREITO SUPERIOR: DISPLAY LCD 20x4 I2C (LCD1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (3.8, -0.2) rectangle (9.0, 3.6);
+    \node[align=center, font=\sffamily\bfseries] at (6.7, 2.1) {LCD1\\Display LCD\\20$\times$4};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (6.7, 0.8) {(I2C)};
+
+    % Alimentacao de LCD1
+    \draw (6.4, 3.6) -- (6.4, 4.4) node[vcc]{+5V};
+    \node[below, font=\ttfamily\scriptsize] at (6.4, 3.6) {VCC};
+
+    \draw (6.4, -0.2) -- (6.4, -1.0) node[ground]{};
+    \node[above, font=\ttfamily\scriptsize] at (6.4, -0.2) {GND};
+
+    % Conexoes I2C (ESP32 -> LCD1)
+    \node[right, font=\ttfamily\scriptsize] at (3.8, 2.2) {SDA};
+    \draw[<->, >=stealth, thick] (0, 2.2) -- (3.8, 2.2)
+        node[midway, above, font=\ttfamily\scriptsize] {SDA};
+
+    \node[right, font=\ttfamily\scriptsize] at (3.8, 0.8) {SCL};
+    \draw[->, >=stealth, thick] (0, 0.8) -- (3.8, 0.8)
+        node[midway, above, font=\ttfamily\scriptsize] {SCL};
+
+    % =========================================================================
+    % 3. BLOCO DIREITO INFERIOR: LED VERMELHO (D1) + RESISTOR (R1 = 220R)
+    % =========================================================================
+    \draw (0, -2.6) -- (1.0, -2.6)
+        to[R, l^=R1, a_=220<\ohm>] (3.8, -2.6)
+        to[leDo, l^={D1 (Vermelho)}] (6.6, -2.6)
+        -- (7.4, -2.6) -- (7.4, -3.4) node[ground]{};
+
+\end{circuitikz}
+\end{document}

@@ -1,0 +1,42 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\ctikzset{
+    resistors/scale=0.8,
+    diodes/scale=0.8
+}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: ESP32 DEVKITC V4 (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (-5.2, -2.2) rectangle (0, 2.2);
+    \node[align=center, font=\sffamily\bfseries] at (-2.9, 0.3) {U1\\ESP32};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (-2.9, -0.6) {(DevKitC V4)};
+
+    % Alimentacao de U1 (+3,3V e GND)
+    \draw (-2.6, 2.2) -- (-2.6, 3.0) node[vcc]{+3,3V};
+    \node[below, font=\ttfamily\footnotesize] at (-2.6, 2.2) {3V3};
+
+    \draw (-2.6, -2.2) -- (-2.6, -3.0) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (-2.6, -2.2) {GND};
+
+    % Pino de saida de U1
+    \node[left, font=\ttfamily\scriptsize] at (0, 0) {GPIO2};
+
+    % =========================================================================
+    % 2. BLOCO DIREITO: LED VERMELHO (D1) + RESISTOR (R1 = 220R)
+    % =========================================================================
+    \draw (0, 0) -- (1.0, 0)
+        to[R, l^=R1, a_=220<\ohm>] (3.8, 0)
+        to[leDo, l^={D1 (Vermelho)}] (6.6, 0)
+        -- (7.4, 0) -- (7.4, -1.0) node[ground]{};
+
+\end{circuitikz}
+\end{document}

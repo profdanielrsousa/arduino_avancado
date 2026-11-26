@@ -1,0 +1,124 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\ctikzset{
+    resistors/scale=0.8,
+    diodes/scale=0.8,
+    switches/scale=0.8
+}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: TECLADO ANALOGICO (ESCADA RESISTIVA EM A0)
+    % =========================================================================
+    % Alimentacao +5V no topo da escada resistiva
+    \draw (-4.0, 4.4) node[vcc]{+5V}
+        to[R, l^=R2, a_=2<\kilo\ohm>] (-4.0, 2.7)
+        to[R, l^=R3, a_=330<\ohm>] (-4.0, 1.1)
+        to[R, l^=R4, a_=620<\ohm>] (-4.0, -0.5)
+        to[R, l^=R5, a_=1<\kilo\ohm>] (-4.0, -2.1)
+        to[R, l^=R6, a_=3.3<\kilo\ohm>] (-4.0, -3.7);
+
+    % 5 Botoes (S1 a S5) ligados entre cada no da escada e o barramento GND
+    \foreach \y/\swname/\func in {
+        2.7/S1/RIGHT,
+        1.1/S2/UP,
+        -0.5/S3/DOWN,
+        -2.1/S4/LEFT,
+        -3.7/S5/SELECT%
+    }{
+        \draw (-7.8, \y) to[push button, l^={\swname\ (\func)}] (-4.0, \y);
+    }
+
+    % Barramento comum de GND dos botoes (sem ponto no canto superior)
+    \draw (-7.8, 2.7) -- (-7.8, -4.6) node[ground]{};
+
+    % Pontos de juncao apenas nas conexoes em T (exclui cantos de 90 graus)
+    \foreach \y in {2.7, 1.1, -0.5, -2.1}{
+        \node[circ] at (-4.0, \y) {};
+    }
+    \foreach \y in {1.1, -0.5, -2.1, -3.7}{
+        \node[circ] at (-7.8, \y) {};
+    }
+
+    % =========================================================================
+    % 2. BLOCO CENTRAL: ARDUINO UNO R3 (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (0, -5.2) rectangle (4.0, 4.2);
+    \node[align=center, font=\sffamily\bfseries] at (2.0, 0.3) {U1\\Arduino\\Uno R3};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (2.0, -0.7) {(ATmega328P)};
+
+    % Alimentacao do Arduino
+    \draw (2.0, 4.2) -- (2.0, 5.0) node[vcc]{+5V};
+    \node[below, font=\ttfamily\footnotesize] at (2.0, 4.2) {5V};
+
+    \draw (2.0, -5.2) -- (2.0, -6.0) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (2.0, -5.2) {GND};
+
+    % Entrada analogica A0 vinda da escada resistiva
+    \draw (-4.0, 2.7) -- (0, 2.7);
+    \node[right, font=\ttfamily\footnotesize] at (0, 2.7) {A0};
+
+    % Saida PWM no pino D3
+    \node[left, font=\ttfamily\footnotesize] at (4.0, -3.1) {D3};
+    \draw[->, >=stealth, thick] (4.0, -3.1) -- (6.0, -3.1)
+        node[right, font=\sffamily\bfseries\footnotesize] {PWM};
+
+    % Saida LED no pino D13 (LED D1 + Resistor R8 de 220 Ohms para GND)
+    \node[left, font=\ttfamily\footnotesize] at (4.0, -4.4) {D13};
+    \draw (4.0, -4.4) -- (4.5, -4.4)
+        to[leDo, l^=D1] (6.3, -4.4)
+        to[R, l^=R8, a_=220<\ohm>] (8.2, -4.4)
+        -- (8.2, -5.2) node[ground]{};
+
+    % =========================================================================
+    % 3. BLOCO DIREITO: DISPLAY LCD 16x2 (HD44780)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (7.6, -2.8) rectangle (12.6, 3.8);
+    \node[align=center, font=\sffamily\bfseries] at (10.3, 0.7) {LCD1\\Display LCD\\16$\times$2};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (10.3, -0.6) {(HD44780)};
+
+    % Conexoes Arduino -> LCD (Modo 4 bits)
+    \foreach \y/\apin/\lpin in {
+        3.0/D8/RS (4),
+        2.0/D9/E (6),
+        1.0/D4/DB4 (11),
+        0.0/D5/DB5 (12),
+        -1.0/D6/DB6 (13),
+        -2.0/D7/DB7 (14)
+    }{
+        \node[left, font=\ttfamily\footnotesize] at (4.0, \y) {\apin};
+        \draw (4.0, \y) -- (7.6, \y);
+        \node[right, font=\ttfamily\scriptsize] at (7.6, \y) {\lpin};
+    }
+
+    % Alimentacao superior do LCD (VDD e Backlight BL+ com resistor de 220R)
+    \draw (9.2, 3.8) -- (9.2, 4.6) node[vcc]{+5V};
+    \node[below, font=\ttfamily\scriptsize] at (9.2, 3.8) {VDD (2)};
+
+    \draw (11.4, 3.8) to[R, l_=R7, a^=220<\ohm>] (11.4, 6.0) node[vcc]{+5V};
+    \node[below, font=\ttfamily\scriptsize] at (11.4, 3.8) {BL+ (15)};
+
+    % Aterramento inferior do LCD (VSS, RW e BL-)
+    \node[above, font=\ttfamily\scriptsize] at (8.8, -2.8) {VSS (1)};
+    \node[above, font=\ttfamily\scriptsize] at (10.2, -2.8) {RW (5)};
+    \node[above, font=\ttfamily\scriptsize] at (11.6, -2.8) {BL- (16)};
+
+    \draw (8.8, -2.8) -- (8.8, -3.8) -- (11.6, -3.8) -- (11.6, -2.8);
+    \draw (10.2, -2.8) -- (10.2, -4.6) node[ground]{};
+    \node[circ] at (10.2, -3.8) {};
+
+    % Ajuste de Contraste (V0) com potenciometro RP1 (20 kOhm) espelhado
+    \node[left, font=\ttfamily\scriptsize] at (12.6, 0.5) {V0 (3)};
+    \draw (14.4, 2.2) node[vcc]{+5V}
+        to[pR, mirror, n=pot, l^={\shortstack[l]{RP1\\\SI{20}{\kilo\ohm}}}] (14.4, -1.2) node[ground]{};
+    \draw (12.6, 0.5) -- (pot.wiper);
+
+\end{circuitikz}
+\end{document}

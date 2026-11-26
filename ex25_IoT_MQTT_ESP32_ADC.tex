@@ -1,0 +1,45 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\ctikzset{
+    resistors/scale=0.85
+}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: ESP32 DEVKITC V4 (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (-5.2, -2.2) rectangle (0, 2.2);
+    \node[align=center, font=\sffamily\bfseries] at (-3.1, 0.3) {U1\\ESP32};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (-3.1, -0.6) {(DevKitC V4)};
+
+    % Alimentacao de U1 (+3,3V e GND)
+    \draw (-2.6, 2.2) -- (-2.6, 3.0) node[vcc]{+3,3V};
+    \node[below, font=\ttfamily\footnotesize] at (-2.6, 2.2) {3V3};
+
+    \draw (-2.6, -2.2) -- (-2.6, -3.0) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (-2.6, -2.2) {GND};
+
+    % Pino de entrada analogica (VN / GPIO39)
+    \node[left, font=\ttfamily\scriptsize] at (0, 0) {VN (GPIO39)};
+
+    % =========================================================================
+    % 2. BLOCO DIREITO: POTENCIOMETRO (POT1)
+    % =========================================================================
+    \draw (3.6, -2.4) node[ground]{}
+        -- (3.6, -1.6)
+        to[pR, n=POT1, l_=POT1] (3.6, 1.6)
+        -- (3.6, 2.4) node[vcc]{+3,3V};
+
+    % Conexao do cursor (SIG) para VN (GPIO39)
+    \draw[->, >=stealth, thick] (POT1.wiper) -- (0, 0)
+        node[midway, above, font=\ttfamily\scriptsize] {SIG};
+
+\end{circuitikz}
+\end{document}

@@ -1,0 +1,71 @@
+\documentclass[border=12pt]{standalone}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[american, siunitx]{circuitikz}
+
+\sisetup{output-decimal-marker={,}}
+
+\ctikzset{
+    resistors/scale=0.8,
+    diodes/scale=0.8
+}
+
+\begin{document}
+\begin{circuitikz}[font=\sffamily\small]
+
+    % =========================================================================
+    % 1. BLOCO ESQUERDO: MOTOR DE PASSO BIPOLAR NEMA 17 + DRIVER (M1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (-6.6, -2.8) rectangle (-2.6, 2.8);
+    \node[align=center, font=\sffamily\bfseries] at (-4.8, 0.4) {M1\\Motor de\\Passo +\\DRIVER};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (-4.8, -0.8) {(NEMA 17)};
+
+    \foreach \y/\mpin in {
+        2.25/B-,
+        0.75/B+,
+        -0.75/A+,
+        -2.25/A-%
+    }{
+        \node[left, font=\ttfamily\footnotesize] at (-2.6, \y) {\mpin};
+        \draw (-2.6, \y) -- (-1.6, \y) node[right, font=\ttfamily\scriptsize] {\mpin};
+    }
+
+    % =========================================================================
+    % 2. BLOCO CENTRAL: ARDUINO UNO R3 (U1)
+    % =========================================================================
+    \draw[thick, fill=gray!5] (0, -3.4) rectangle (4.0, 3.4);
+    \node[align=center, font=\sffamily\bfseries] at (2.0, 0.3) {U1\\Arduino\\Uno R3};
+    \node[font=\sffamily\scriptsize, text=gray!70!black] at (2.0, -0.7) {(ATmega328P)};
+
+    % Alimentacao do Arduino
+    \draw (2.0, 3.4) -- (2.0, 4.2) node[vcc]{+5V};
+    \node[below, font=\ttfamily\footnotesize] at (2.0, 3.4) {5V};
+
+    \draw (2.0, -3.4) -- (2.0, -4.2) node[ground]{};
+    \node[above, font=\ttfamily\footnotesize] at (2.0, -3.4) {GND};
+
+    % =========================================================================
+    % 3. BLOCO DIREITO: 4 LEDs INDICADORES + RESISTORES LIMITADORES (220R)
+    % =========================================================================
+    \foreach \y/\pin/\lbl/\dname/\rname in {
+        2.25/D2/B-/D1/R1,
+        0.75/D3/B+/D2/R2,
+        -0.75/D4/A+/D3/R3,
+        -2.25/D5/A-/D4/R4%
+    }{
+        \node[left, font=\ttfamily\footnotesize] at (4.0, \y) {\pin};
+        \draw (4.0, \y) -- (5.2, \y)
+            node[midway, above, font=\ttfamily\scriptsize] {\lbl}
+            to[leDo, l^=\dname] (7.6, \y)
+            to[R, l^=\rname, a_=220<\ohm>] (10.2, \y)
+            -- (11.0, \y);
+    }
+
+    % Barramento comum de GND dos LEDs (sem ponto no canto superior de 90 graus)
+    \draw (11.0, 2.25) -- (11.0, -3.4) node[ground]{};
+    \foreach \y in {0.75, -0.75, -2.25}{
+        \node[circ] at (11.0, \y) {};
+    }
+
+\end{circuitikz}
+\end{document}
